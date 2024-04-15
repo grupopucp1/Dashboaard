@@ -8,7 +8,7 @@ st.write('¡Hola!')
 def reset_1():
     st.session_state['ubigeo'] = None
 
-df = pd.read_csv(r"mount/src/dashboaard/Data/TB_CENTRO_VACUNACION.csv",
+df = pd.read_csv(r"/mount/src/dashboaard/Data/TB_CENTRO_VACUNACION.csv",
                  sep = ";")
 
 df_1 = pd.read_csv(r"/mount/src/dashboaard/Data/TB_UBIGEOS.csv",
