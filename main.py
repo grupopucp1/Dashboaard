@@ -29,9 +29,11 @@ def format_option(option):
     row = df_2[df_2['id_ubigeo'] == option]
     etiqueta = row['ubigeo_inei'].astype(str).iloc[0]
     etiq_depa = row['departamento'].iloc[0]
+    etiq_prov = row['provincia'].iloc[0]
+    etiq_dist = row['distrito'].iloc[0]
     etiqueta_formateada = etiqueta.zfill(6)
     # Concatenar la etiqueta con la información adicional
-    etiqueta_concatenada = f"{etiqueta_formateada} - {etiq_depa}"
+    etiqueta_concatenada = f"{etiqueta_formateada} - {etiq_depa} - {etiq_prov} - {etiq_dist}"
     return etiqueta_concatenada
 
 def reset_ubi():
