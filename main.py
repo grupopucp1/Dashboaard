@@ -4,8 +4,6 @@ import numpy as np
 
 st.set_page_config(layout="wide")
 st.title('Grupo 1 - PUCP Python')
-st.write('¡Hola!')
-
 
 def reset_1():
     st.session_state['ubigeo'] = None
@@ -110,7 +108,7 @@ with col1:
 #     df_2 = df_2[((df_2['id_ubigeo'] == ubigeo))]
 
 
-st.write(df_2.head())
+st.write(df_2[["id_centro_vacunacion", "id_ubigeo", "nombre","departamento", "provincia", "distrito"]].head())
 
 with col2:
     if not df.empty:
