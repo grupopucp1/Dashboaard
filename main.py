@@ -24,17 +24,19 @@ df = df[~((df['lat'] == 0) & (df['lon'] == 0))]
 df_2 = pd.merge(df, df_1, on='id_ubigeo', how='inner')
 df_2['ubigeo_inei'] = df_2['ubigeo_inei'].astype(str).apply(lambda x: x.zfill(6))
 
-def format_option(option):
+df_2["concat"] = df_2["ubigeo_inei"] + " - "+  df_2["departamento"] + " - " +df_2["provincia"] + " - " + df_2["distrito"]
+
+#def format_option(option):
     # Buscar la etiqueta y la información adicional correspondiente al ID seleccionado
-    row = df_2[df_2['id_ubigeo'] == option]
-    etiqueta = row['ubigeo_inei'].astype(str).iloc[0]
-    etiq_depa = row['departamento'].iloc[0]
-    etiq_prov = row['provincia'].iloc[0]
-    etiq_dist = row['distrito'].iloc[0]
-    etiqueta_formateada = etiqueta.zfill(6)
+#    row = df_2[df_2['id_ubigeo'] == option]
+#    etiqueta = row['ubigeo_inei'].astype(str).iloc[0]
+#    etiq_depa = row['departamento'].iloc[0]
+#    etiq_prov = row['provincia'].iloc[0]
+#    etiq_dist = row['distrito'].iloc[0]
+#    etiqueta_formateada = etiqueta.zfill(6)
     # Concatenar la etiqueta con la información adicional
-    etiqueta_concatenada = f"{etiqueta_formateada} - {etiq_depa} - {etiq_prov} - {etiq_dist}"
-    return etiqueta_concatenada
+#    etiqueta_concatenada = f"{etiqueta_formateada} - {etiq_depa} - {etiq_prov} - {etiq_dist}"
+#    return etiqueta_concatenada
 
 def reset_ubi():
     st.session_state['ubigeo'] = None
@@ -90,9 +92,9 @@ with col1:
     ubigeo  = st.selectbox(
         "Seleccione Ubigeo",
         label_visibility = "collapsed",
-        options = df_2["id_ubigeo"].unique(),
+        options = df_2["concat"].unique(),
         index = None,
-        format_func = format_option,
+        #format_func = format_option,
         key = 'ubigeo',
         placeholder = "Seleccione Ubigeo",
         on_change = reset_dep
@@ -141,9 +143,7 @@ with col1:
         df_2 = df_2[((df_2['distrito'] == distrito))]
 
 if ubigeo != None:
-    df_2 = df_2[((df_2['id_ubigeo'] == ubigeo))]
-
-
+    df_2 = df_2[((df_2['concat'] == ubigeo))]
 
 with col2:
     if not df.empty:
