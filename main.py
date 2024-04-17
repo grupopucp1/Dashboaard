@@ -2,11 +2,11 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-st.set_page_config(layout="wide")
-st.title('Grupo 1 - PUCP Python')
+st.set_page_config(page_title   = "Centros de Vacunación", 
+                   page_icon    = ":syringe:",
+                   layout       = "wide")
 
-def reset_1():
-    st.session_state['ubigeo'] = None
+st.title('Grupo 1 - PUCP Python')
 
 df = pd.read_csv(r"/mount/src/dashboaard/Data/TB_CENTRO_VACUNACION.csv",
                  sep = ";")
@@ -81,11 +81,11 @@ def act_dep_prov_fr_dis():
 
 departamento_options = df_2['departamento'].unique()
 
+st.header("Centros de Vacunación COVID-19")
+
 col1, col2 = st.columns(2)
 
 with col1:
-
-    st.header("Centros de Vacunación COVID-19")
     st.subheader("Busqueda por Ubigeo")
     ubigeo  = st.selectbox(
         "Seleccione Ubigeo",
@@ -147,8 +147,30 @@ if ubigeo != None:
 
 with col2:
     if not df.empty:
-        st.map(df_2[["lat", "lon"]])
+        if len(df_2)>1:
+            st.write(":round_pushpin: Se encontraron {} Centros de Vacunación".format(int(len(df_2))))    
+        elif len(df_2) ==1:
+            st.write(":round_pushpin: Se encontró 1 Centros de Vacunación")
+        else:
+            st.write("No se encontraron Centros de Vacunación")
+
+        mapa = st.map(df_2,
+               latitude = "lat",
+               longitude = "lon",
+               color='#ff0000')
     else:
         st.write("No hay datos válidos para mostrar en el mapa.")
 
-st.dataframe(df_2[["id_centro_vacunacion", "ubigeo_inei", "nombre", "departamento", "provincia", "distrito"]], use_container_width=True)
+df_3 = df_2[["id_centro_vacunacion", "ubigeo_inei", "nombre", "departamento", "provincia", "distrito"]].copy()
+
+df_3.rename(columns = {
+    "id_centro_vacunacion": "ID Centro", 
+    "ubigeo_inei": "Ubigeo",
+    "nombre": "Centro de Vacunación",
+    "departamento": "Departamento",
+    "provincia":"Provincia",
+    "distrito":"Distrito"
+    }, inplace=True)
+
+st.dataframe(df_3.reset_index(drop=True), use_container_width=True)
+
