@@ -107,8 +107,8 @@ with col1:
 # if ubigeo != None:
 #     df_2 = df_2[((df_2['id_ubigeo'] == ubigeo))]
 
-
-st.write(df_2[["id_centro_vacunacion", "id_ubigeo", "nombre","departamento", "provincia", "distrito"]].head())
+st.set_page_config(layout="wide")
+st.write(df_2[["id_centro_vacunacion", "ubigeo_inei", "nombre","departamento", "provincia", "distrito"]])
 
 with col2:
     if not df.empty:
