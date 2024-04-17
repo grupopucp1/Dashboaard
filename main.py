@@ -110,7 +110,7 @@ with col1:
 #     df_2 = df_2[((df_2['id_ubigeo'] == ubigeo))]
 
 
-st.write(df_2.head())
+st.write(df_2[["nombre","entidad_administra","departamento", "provincia", "distrito"]].head())
 
 with col2:
     if not df.empty:
