@@ -23,20 +23,11 @@ df.rename(columns={"latitud": "lat", "longitud": "lon"}, inplace=True)
 df['lat'] = df['lat'].astype(float)
 df['lon'] = df['lon'].astype(float)
 
-
 df = df[(df['lat'].between(-90, 90)) & (df['lon'].between(-180, -45))]
 df = df[~((df['lat'] == 0) & (df['lon'] == 0))]
 
 df_2 = pd.merge(df, df_1, on='id_ubigeo', how='inner')
-
-
-# Función para mostrar solo la etiqueta en el selectbox
-# def format_option(option):
-#     # Buscar la etiqueta correspondiente al ID seleccionado
-#     etiqueta = df_2[df_2['id_ubigeo'] == option]['ubigeo_inei'].astype(str).iloc[0]
-#     # Asumiendo que las etiquetas son numéricas o que deseas tratarlas como tal para formatear
-#     etiqueta_formateada = etiqueta.zfill(6)
-#     return etiqueta_formateada
+df_2['ubigeo_inei'] = df_2['ubigeo_inei'].astype(str).apply(lambda x: x.zfill(6))
 
 def format_option(option):
     # Buscar la etiqueta y la información adicional correspondiente al ID seleccionado
@@ -48,69 +39,119 @@ def format_option(option):
     etiqueta_concatenada = f"{etiqueta_formateada} - {etiq_depa}"
     return etiqueta_concatenada
 
+def reset_ubi():
+    st.session_state['ubigeo'] = None
 
+def reset_dep():
+    st.session_state['departamento'] = None
+    st.session_state['provincia'] = None
+    st.session_state['distrito'] = None
+
+if 'departamento' not in st.session_state:
+    st.session_state['departamento'] = None
+if 'provincia' not in st.session_state:
+    st.session_state['provincia'] = None
+
+def act_dep_fr_prov():
+    st.session_state['ubigeo'] = None
+    if 'provincia' in st.session_state and st.session_state['provincia']:
+        selected_provincia = st.session_state['provincia']
+        departamento = df_2[df_2['provincia'] == selected_provincia]['departamento']
+        if not departamento.empty:
+            st.session_state['departamento'] = departamento.unique()[0]
+        else:
+            st.session_state['departamento'] = None
+        st.session_state['provincia'] = selected_provincia
+
+def act_dep_prov_fr_dis():
+    st.session_state['ubigeo'] = None
+    if 'distrito' in st.session_state and st.session_state['distrito']:
+        selected_distrito = st.session_state['distrito']
+        departamento = df_2[df_2['distrito'] == selected_distrito]['departamento']
+        provincia = df_2[df_2['distrito'] == selected_distrito]['provincia']
+
+        if not departamento.empty:
+            st.session_state['departamento'] = departamento.unique()[0]
+        else:
+            st.session_state['departamento'] = None
+        if not provincia.empty:
+            st.session_state['provincia'] = provincia.unique()[0]
+        else:
+            st.session_state['provincia'] = None
+
+        st.session_state['distrito'] = selected_distrito
+
+
+departamento_options = df_2['departamento'].unique()
 
 col1, col2 = st.columns(2)
 
 with col1:
 
-    st.title("Centros de Vacunación COVID-19")
+    st.header("Centros de Vacunación COVID-19")
+    st.subheader("Busqueda por Ubigeo")
     ubigeo  = st.selectbox(
-        "Buscar por Ubigeo",
-    options = df_2["id_ubigeo"].unique(),
-    index = None,
-    format_func = format_option,
-    key='ubigeo',
-    placeholder = "Seleccione Ubigeo",
+        "Seleccione Ubigeo",
+        label_visibility = "collapsed",
+        options = df_2["id_ubigeo"].unique(),
+        index = None,
+        format_func = format_option,
+        key = 'ubigeo',
+        placeholder = "Seleccione Ubigeo",
+        on_change = reset_dep
     )
-
-    # Filtramos el DataFrame basado en el ubigeo seleccionado
-    df_2 = df_2[df_2["id_ubigeo"] == ubigeo]
+    
+    st.divider()
+    st.subheader("Busqueda por Ubicación")
 
     departamento  = st.selectbox(
         "Buscar por Departamento",
-    df_2["departamento"].unique(),
-    index = None,
-    placeholder = "Seleccione Departamento",
-    #    on_change = reset_1
+        label_visibility = "collapsed",
+        options = df_2["departamento"].unique(),
+        index = None,
+        key = "departamento",
+        placeholder = "Seleccione Departamento",
+        on_change = reset_ubi
     )
 
-    # Filtramos el DataFrame basado en el ubigeo seleccionado
-    df_2 = df_2[df_2["departamento"] == departamento]
+    if departamento != None:
+        df_2 = df_2[((df_2['departamento'] == departamento))]
 
     provincia  = st.selectbox(
-        "Buscar por provincia",
-    df_2["provincia"].unique(),
-    index = None,
-    placeholder = "Seleccione provincia",
-    #   on_change = reset_1
+            "Buscar por provincia",
+            label_visibility = "collapsed",
+            options = df_2["provincia"].unique(),
+            index = None,
+            key = "provincia",
+            placeholder = "Seleccione provincia",
+            on_change = act_dep_fr_prov
     )
-    # Filtramos el DataFrame basado en el ubigeo seleccionado
-    df_2= df_2[df_2["provincia"] == provincia]
+
+    if provincia != None:
+        df_2 = df_2[((df_2['provincia'] == provincia))]
+
     distrito  = st.selectbox(
-        "Buscar por distrito",
-    df_2["distrito"].unique(),
-    index = None,
-    placeholder = "Seleccione distrito",
-    # on_change = reset_1
+            "Buscar por distrito",
+            label_visibility = "collapsed",
+            options = df_2["distrito"].unique(),
+            index = None,
+            key = "distrito",
+            placeholder = "Seleccione distrito",
+            on_change = act_dep_prov_fr_dis
     )
 
-# if departamento != None:
-#     df_2 = df_2[((df_2['departamento'] == departamento))]
+    if distrito != None:
+        df_2 = df_2[((df_2['distrito'] == distrito))]
 
-# if provincia != None:
-#     df_2 = df_2[((df_2['provincia'] == provincia))]
+if ubigeo != None:
+    df_2 = df_2[((df_2['id_ubigeo'] == ubigeo))]
 
-# if distrito != None:
-#     df_2 = df_2[((df_2['distrito'] == distrito))]
 
-# if ubigeo != None:
-#     df_2 = df_2[((df_2['id_ubigeo'] == ubigeo))]
-
-st.write(df_2[["id_centro_vacunacion", "ubigeo_inei", "nombre","departamento", "provincia", "distrito"]])
 
 with col2:
     if not df.empty:
         st.map(df_2[["lat", "lon"]])
     else:
         st.write("No hay datos válidos para mostrar en el mapa.")
+
+st.dataframe(df_2[["id_centro_vacunacion", "ubigeo_inei", "nombre", "departamento", "provincia", "distrito"]], use_container_width=True)
