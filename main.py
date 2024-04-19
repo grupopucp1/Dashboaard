@@ -14,6 +14,12 @@ df = pd.read_csv(r"/mount/src/dashboaard/Data/TB_CENTRO_VACUNACION.csv",
 df_1 = pd.read_csv(r"/mount/src/dashboaard/Data/TB_UBIGEOS.csv",
                  sep = ";")
 
+
+# Convertir cadenas vacías y otros posibles valores vacíos a NaN
+df.replace(['', None, 'NA'], np.nan, inplace=True)
+df_1.replace(['', None, 'NA'], np.nan, inplace=True)
+
+
 df.rename(columns={"latitud": "lat", "longitud": "lon"}, inplace=True)
 df['lat'] = df['lat'].astype(float)
 df['lon'] = df['lon'].astype(float)
@@ -171,6 +177,11 @@ df_3.rename(columns = {
     "provincia":"Provincia",
     "distrito":"Distrito"
     }, inplace=True)
+
+
+
+st.subheader("Detalle de resultado de búsqueda (Centros de Vacunación)")
+
 
 st.dataframe(df_3.reset_index(drop=True), use_container_width=True)
 
