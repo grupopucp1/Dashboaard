@@ -28,6 +28,21 @@ df = df[(df['lat'].between(-90, 90)) & (df['lon'].between(-180, -45))]
 df = df[~((df['lat'] == 0) & (df['lon'] == 0))]
 
 df_2 = pd.merge(df, df_1, on='id_ubigeo', how='inner')
+
+# Aplicar filtro para eliminar las coordenadas específicas
+df_2 = df_2[~((df_2['lat'] == -11.69362300) & (df_2['lon'] == -78.60168760))]
+df_2 = df_2[~((df_2['lat'] == -14.14865833) & (df_2['lon'] == -76.26907333))]
+df_2 = df_2[~((df_2['lat'] == -8.98800646) & (df_2['lon'] == -78.96392121))]
+
+# Verificación: Imprime las filas que deberían haber sido eliminadas para confirmar que ya no están
+print("Verificación de la eliminación de las coordenadas específicas:")
+print(df_2[(df_2['lat'] == -11.69362300) & (df_2['lon'] == -78.60168760)])
+print(df_2[(df_2['lat'] == -14.14865833) & (df_2['lon'] == -76.26907333)])
+print(df_2[(df_2['lat'] == -8.98800646) & (df_2['lon'] == -78.96392121)])
+
+
+
+
 df_2['ubigeo_inei'] = df_2['ubigeo_inei'].astype(str).apply(lambda x: x.zfill(6))
 
 df_2["concat"] = df_2["ubigeo_inei"] + " - "+  df_2["departamento"] + " - " +df_2["provincia"] + " - " + df_2["distrito"]
