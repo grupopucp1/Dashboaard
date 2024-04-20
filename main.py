@@ -94,7 +94,7 @@ st.header("Centros de Vacunación COVID-19")
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader("Busqueda por Ubigeo")
+    st.subheader("Búsqueda por Ubigeo")
     ubigeo  = st.selectbox(
         "Seleccione Ubigeo",
         label_visibility = "collapsed",
@@ -107,7 +107,7 @@ with col1:
     )
     
     st.divider()
-    st.subheader("Busqueda por Ubicación")
+    st.subheader("Búsqueda por Ubicación")
 
     departamento  = st.selectbox(
         "Buscar por Departamento",
